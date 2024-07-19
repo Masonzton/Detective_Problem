@@ -1,4 +1,4 @@
-"""specify sampling by list of numbers"""
+"""specify sampling by list of numbers. Also calculate atoms"""
 
 from typing import List
 import math
@@ -104,7 +104,8 @@ def construct_atom_list(number_of_people, number_of_interviews):
 
 def experiment_1_manual():
     SAMPLE_HISTORY = [
-        [0,1,2],
+        [0,1,2,3,4,5,6,7,8,9],
+        [],
         [0,3,4],
         [1,3,5],
         [2,4,5],

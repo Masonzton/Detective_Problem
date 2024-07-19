@@ -1,4 +1,4 @@
-"""Sample groups by partitions"""
+"""Sample groups by brute force iterating and other nonsense"""
 from typing import List
 from itertools import chain, combinations
 
