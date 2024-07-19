@@ -3,18 +3,20 @@
 from typing import List
 import math
 # just start with n = 5
-N = 20
-all_combs: List[str] = []
+def generate_all_combs(n: int) -> List[str]:
+    all_combs: List[str] = []
 
-for i in range(N):
-    for j in range(N):
-        if i == j:
-            continue
-        entry = ["O" for i in range(N)]
-        entry[i] = "X"
-        entry[j] = "W"
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                continue
+            entry = ["O" for i in range(n)]
+            entry[i] = "X"
+            entry[j] = "W"
 
-        all_combs.append("".join(entry))
+            all_combs.append("".join(entry))
+    
+    return all_combs
 
 def debug_length(input_list: List[str]):
     unique_x_positions = set()
@@ -37,7 +39,7 @@ def sample_positions(input_list: List[str], sample_list: List[int]):
     
     return filtered_list
 
-def calculate_atoms(sample_history: List[List[int]]) -> List[List[int]]:
+def calculate_atoms(N: int, sample_history: List[List[int]]) -> List[List[int]]:
     number_of_interviews = len(sample_history)
 
     # calculate the atoms of samples given it's history
@@ -104,20 +106,20 @@ def construct_atom_list(number_of_people, number_of_interviews):
 
 def experiment_1_manual():
     SAMPLE_HISTORY = [
-        [0,1,2,3,4,5,6,7,8,9],
-        [],
+        [0,1,2],
         [0,3,4],
         [1,3,5],
         [2,4,5],
     ]
-    filtered_list = all_combs
+    N = 6
+    filtered_list = generate_all_combs(6)
     for sample in SAMPLE_HISTORY:
         filtered_list = sample_positions(filtered_list, sample)
         debug_length(filtered_list)
 
     # for entry in filtered_list:
     #     print(entry)
-    atom_list = calculate_atoms(SAMPLE_HISTORY)
+    atom_list = calculate_atoms(N, SAMPLE_HISTORY)
     sample_list = atoms_to_interview(atom_list)
     for sample in sample_list:
         print(sample)
@@ -125,10 +127,25 @@ def experiment_1_manual():
     return atom_list
 
 def experiment_2_calculated():
-    atom_list = construct_atom_list(N, 6)
+    # N = 12870
+    # N = 1287000
+    N = 10
+    lower_bound = int(math.log2(N))
+    upper_bound = lower_bound + 10 # this is a guess?
+    for guess in range(lower_bound, upper_bound+1):
+        if math.comb(guess, int(guess/2)) >= N:
+            print(f"Number of samples is {guess}")
+            break
+    else:
+        # guess not found
+        assert False
+    atom_list = construct_atom_list(N, guess)
     interviews = atoms_to_interview(atom_list)
-    print(interviews)
-    filtered_list = all_combs
+    for interview in interviews:
+        print(interview)
+    # this next step is really slow, but I don't care
+    print("generating validation data")
+    filtered_list = generate_all_combs(N)
     for sample in interviews:
         filtered_list = sample_positions(filtered_list, sample)
         debug_length(filtered_list)

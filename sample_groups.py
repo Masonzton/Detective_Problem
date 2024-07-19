@@ -43,6 +43,37 @@ def sample_positions(input_list: List[str], sample_list: List[int]):
     
     return filtered_list
 
+def calculate_atoms(N: int, sample_history: List[List[int]]) -> List[List[int]]:
+    number_of_interviews = len(sample_history)
+
+    # calculate the atoms of samples given it's history
+    number_of_atoms = 2**(number_of_interviews)
+
+    # how many values are there for each atom
+    atom_list = [0 for _ in range(number_of_atoms)]
+    atom_groups = [ [] for _ in range(number_of_atoms)]
+    for atom_number in range(number_of_atoms):
+        # atoms index corresponds to which samples are off or on
+        # for example, i = 0 means selections that fall into no sample
+        temp_array = [False for _ in range(number_of_interviews)]
+        for interview_number in range(number_of_interviews):
+            temp_array[interview_number] = bool(atom_number & (1 << interview_number))
+        
+        for person in range(N):
+            # in atom only if temp_array matches
+            is_in_atom = True
+            for interview_number, interview in enumerate(sample_history):
+                if (person in interview) != temp_array[interview_number]:
+                    is_in_atom = False
+                    break
+                    # skip this person for this atom
+            if is_in_atom:
+                atom_list[atom_number] += 1
+                atom_groups[atom_number].append(person)
+        print(f"{temp_array}: {atom_list[atom_number]}: {atom_groups[atom_number]}")
+    # return atom_list
+    return atom_groups
+
 print(f"Total sample space: {(2**N)**4}")
 
 def example_1():
@@ -75,10 +106,11 @@ def example_1():
                         continue
                     filtered_list_3 = sample_positions(filtered_list_2, subset_3)
                     new_length = debug_length(filtered_list_3)
-                    # if (new_length <= 1):
-                    if (len(filtered_list_3) <= 1):
+                    if (new_length <= 1):
+                    # if (len(filtered_list_3) <= 1):
                         print(f"{len(subset_0)}:{subset_0}, {len(subset_1)}: {subset_1}, {len(subset_2)}: {subset_2}, {len(subset_3)}: {subset_3}")
                         debug_length(filtered_list_3, debug=True)
+                        calculate_atoms(N, [subset_0, subset_1, subset_2, subset_3])
                         winners += 1
                         return
                     min_left = min(new_length, min_left)
