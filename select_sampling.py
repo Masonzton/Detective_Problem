@@ -1,8 +1,9 @@
 """specify sampling by list of numbers"""
 
 from typing import List
+import math
 # just start with n = 5
-N = 6
+N = 20
 all_combs: List[str] = []
 
 for i in range(N):
@@ -36,7 +37,7 @@ def sample_positions(input_list: List[str], sample_list: List[int]):
     
     return filtered_list
 
-def calculate_atoms(sample_history: List[List[int]]) -> List[int]:
+def calculate_atoms(sample_history: List[List[int]]) -> List[List[int]]:
     number_of_interviews = len(sample_history)
 
     # calculate the atoms of samples given it's history
@@ -64,8 +65,42 @@ def calculate_atoms(sample_history: List[List[int]]) -> List[int]:
                 atom_list[atom_number] += 1
                 atom_groups[atom_number].append(person)
         print(f"{temp_array}: {atom_list[atom_number]}: {atom_groups[atom_number]}")
-    return atom_list
+    # return atom_list
+    return atom_groups
 # debug_length(all_combs)
+
+def atoms_to_interview(atoms: List[List[int]]) -> List[List[int]]:
+    number_of_atoms = len(atoms)
+    # length of the list should be a power of two
+    assert (number_of_atoms & (number_of_atoms-1) == 0) and number_of_atoms != 0
+    number_of_interviews = int(math.log2(number_of_atoms))
+    sample_list = []
+    for interview_number in range(number_of_interviews):
+        current_interview = []
+        for atom_number in range(number_of_atoms):
+            if (atom_number & (1 << interview_number)):
+                current_interview.extend(atoms[atom_number])
+        sample_list.append(current_interview)
+    
+    return sample_list
+
+def construct_atom_list(number_of_people, number_of_interviews):
+    number_of_atoms = 2**number_of_interviews
+    ideal_split = int(number_of_interviews/2)
+    atom_list = [ [] for _ in range(number_of_atoms)]
+    current_person = 0
+    for atom_number in range(number_of_atoms):
+        if atom_number.bit_count() == ideal_split:
+            atom_list[atom_number] = [current_person]
+            current_person += 1
+            if current_person >= number_of_people:
+                # all people are assigned yay :)
+                break
+    
+    # all people should have been assigned
+    assert current_person >= number_of_people
+    return atom_list
+    
 
 def experiment_1_manual():
     SAMPLE_HISTORY = [
@@ -79,10 +114,26 @@ def experiment_1_manual():
         filtered_list = sample_positions(filtered_list, sample)
         debug_length(filtered_list)
 
-    for entry in filtered_list:
-        print(entry)
+    # for entry in filtered_list:
+    #     print(entry)
     atom_list = calculate_atoms(SAMPLE_HISTORY)
-    print(atom_list)
-    
+    sample_list = atoms_to_interview(atom_list)
+    for sample in sample_list:
+        print(sample)
 
-experiment_1_manual()
+    return atom_list
+
+def experiment_2_calculated():
+    atom_list = construct_atom_list(N, 6)
+    interviews = atoms_to_interview(atom_list)
+    print(interviews)
+    filtered_list = all_combs
+    for sample in interviews:
+        filtered_list = sample_positions(filtered_list, sample)
+        debug_length(filtered_list)
+
+    pass
+
+
+# experiment_1_manual()
+experiment_2_calculated()
