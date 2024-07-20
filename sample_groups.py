@@ -1,11 +1,13 @@
 """Sample groups by brute force iterating and other nonsense"""
 from typing import List
 from itertools import chain, combinations
+import itertools
 
 def powerset(iterable):
     "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
     s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+    # want to exclude interviews with whole set and empty set
+    return chain.from_iterable(combinations(s, r) for r in range(1, len(s)))
 
 N = 6
 all_combs: List[str] = []
@@ -76,49 +78,48 @@ def calculate_atoms(N: int, sample_history: List[List[int]]) -> List[List[int]]:
 
 print(f"Total sample space: {(2**N)**4}")
 
-def example_1():
+def debug_print_history(interview_history):
     filtered_list = all_combs
+    for interview in interview_history:
+        filtered_list = sample_positions(filtered_list, interview)
+
+    interview_lengths = [len(t) for t in interview_history]
+    print(f"interviews: {interview_history}: length of each is: {interview_lengths}")
+    debug_length(filtered_list, debug=True)
+    calculate_atoms(N, interview_history)
+    pass
+
+def example_1():
     winners = 0
-    # lets just iterate through all subsets
     min_left = N
-    for subset_0 in powerset(range(N)):
+    number_of_interviews = 3
+    # lets just iterate through all subsets
+    # combine power sets to make the total interview space
+    for interview_history in itertools.combinations_with_replacement(powerset(range(N)), number_of_interviews):
         filtered_list = all_combs
-        if len(subset_0) == 0 or len(subset_0) == N:
-            continue
-        filtered_list_0 = sample_positions(filtered_list, subset_0)
-        # min_left = min(debug_length(filtered_list), min_left)
-        for subset_1 in powerset(range(N)):
-            if len(subset_1) == 0 or len(subset_1) == N:
-                continue
-            filtered_list_1 = sample_positions(filtered_list_0, subset_1)
-            # min_left = min(debug_length(filtered_list), min_left)
-            for subset_2 in powerset(range(N)):
-                if len(subset_2) == 0 or len(subset_2) == N:
-                    continue
-                filtered_list_2 = sample_positions(filtered_list_1, subset_2)
-                new_length = debug_length(filtered_list_2)
-                # if (new_length <= 1):
-                #     print(f"{subset_0}, {subset_1}, {subset_2}")
-                #     debug_length(filtered_list_2, debug=True)
-                min_left = min(new_length, min_left)
-                for subset_3 in powerset(range(N)):
-                    if len(subset_3) == 0 or len(subset_3) == N:
-                        continue
-                    filtered_list_3 = sample_positions(filtered_list_2, subset_3)
-                    new_length = debug_length(filtered_list_3)
-                    if (new_length <= 1):
-                    # if (len(filtered_list_3) <= 1):
-                        print(f"{len(subset_0)}:{subset_0}, {len(subset_1)}: {subset_1}, {len(subset_2)}: {subset_2}, {len(subset_3)}: {subset_3}")
-                        debug_length(filtered_list_3, debug=True)
-                        calculate_atoms(N, [subset_0, subset_1, subset_2, subset_3])
-                        winners += 1
-                        return
-                    min_left = min(new_length, min_left)
+        for interview in interview_history:
+            filtered_list = sample_positions(filtered_list, interview)
+
+        new_length = debug_length(filtered_list)
+        if (new_length <= 1):
+        # if (len(filtered_list_3) <= 1):
+            # interview_str = ",".join(interview_history)
+            debug_print_history(interview_history)
+            winners += 1
+            return
+
+        if new_length < min_left:
+            min_left = new_length
+            best_set = interview_history
+
+    debug_print_history(best_set)
+        
     print(winners)
         
     print(min_left)
 
 example_1()
+
 # first sample the first group
 # sample_history = []
 
