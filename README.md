@@ -1,0 +1,8 @@
+Riddle:
+You are detective and there has been a murder. There are 20 suspects that you need to narrow down. One of these is a murderer and there is another person who is a witness to that murder. You can narrow down suspects by conducting an interview with any subset of the suspects. If the witness is in the interview they will proclaim who the murderer is, but only if the murderer is not present in the interview.
+
+This is a repo for messing around with the riddle to get the solutions. select_sampling.py is a messy solution I have for generating the guesses for the general case and then validating that it actually does solve. I also have been messing around a little with computing the number of unique interview possibilities. Number of unique interview combinations with N people given k interviews. So far uniqueness just meaning that different permutations of interview order are essentially the same and different orderings or labeling of the people are the same.
+
+Spoiler... Answer is.....
+You can do this with 6 interviews. The idea is that you assign interviews such that each individual gets there own subset of interviews and no two people's subset of interviews overlaps. One way to do this is to choose 3 out of the 6 interviews for each person. So there is 6 choose 3 or 20 different ways to do this. In general, with k interviews you can find the murderer among k choose k/2 people. I'm actually not 100% confident this is optimal, but my friend told me it was the correct answer here. The lower bound is at least log2(N) since otherwise two people would be in the same set of interviews and would be indistinguishable.
+Spoiler above this...
