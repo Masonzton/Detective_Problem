@@ -31,7 +31,7 @@ def pretty_print_atoms(atom_numbers: List[int], number_of_interviews: int):
         for interview_number in range(number_of_interviews):
             temp_array[interview_number] = bool(atom_number & (1 << interview_number))
 
-        print(f"{temp_array}")
+        print(f"{atom_number}: {temp_array}")
 
 
 def powerset(iterable) -> chain[List[int]]:
@@ -47,3 +47,36 @@ def unique_murder_positions(input_list: Tuple[int, int]):
     for comb in input_list:
         unique_x_positions.add(comb[0])
     return unique_x_positions
+
+
+def get_murderous_atoms(atoms: List[int]) -> List[int]:
+    """Given a set of atoms determine exactly which atoms the murderer could be under.
+    Under the assumption that the witness does not speak with this interview combo"""
+    # an atom can be murderous if and only if there exists a witness atom such that
+    # the murderous atom completely covers it
+    murderous_atoms = []
+    for murder_atom in atoms:
+        for witness_atom in atoms:
+            if murder_atom == witness_atom:
+                continue
+            if witness_atom & ~murder_atom == 0:
+                murderous_atoms.append(murder_atom)
+                break
+
+    return murderous_atoms
+
+
+def get_witness_atoms(atoms: List[int]):
+    """Given a set of atoms determine exactly which atoms the witness could be under.
+    Under the assumption that the witness does not speak with this interview combo"""
+    # see get murderous atoms for inverse explanation
+    witness_atoms = []
+    for witness_atom in atoms:
+        for murder_atom in atoms:
+            if murder_atom == witness_atom:
+                continue
+            if witness_atom & ~murder_atom == 0:
+                witness_atoms.append(witness_atom)
+                break
+
+    return witness_atoms
