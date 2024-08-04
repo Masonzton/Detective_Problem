@@ -86,7 +86,9 @@ def main():
         filtered_space = filter_with_sample(filtered_space, interview)
 
     print(
-        f"possibility space left after sampling is\nsize={len(filtered_space)}.\nentries={filtered_space}"
+        f"""possibility space left after sampling is
+        size={len(filtered_space)}.
+        entries={filtered_space}"""
     )
     print(f"unique murderer positions is {unique_murder_positions(filtered_space)}")
 
